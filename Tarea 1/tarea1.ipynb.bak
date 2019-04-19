@@ -52,7 +52,7 @@
   },
   {
    "cell_type": "code",
-   "execution_count": 1,
+   "execution_count": 2,
    "metadata": {},
    "outputs": [],
    "source": [
@@ -79,7 +79,7 @@
   },
   {
    "cell_type": "code",
-   "execution_count": 2,
+   "execution_count": 3,
    "metadata": {},
    "outputs": [],
    "source": [
@@ -98,9 +98,7 @@
   {
    "cell_type": "code",
    "execution_count": 4,
-   "metadata": {
-    "scrolled": false
-   },
+   "metadata": {},
    "outputs": [
     {
      "data": {
@@ -200,16 +198,11 @@
    "cell_type": "markdown",
    "metadata": {},
    "source": [
-    "Los tres datasets tienen un pequeño tamaño y dimensionalidad, por lo que los algoritmos a probar no mostrarán diferencias apreciables en cuanto a tiempos de ejecución, siendo este aspecto uno muy importante a la hora de realizar comparaciones entre distintas técnicas. Por lo tanto, sólo será posible comparar en términos de calidad de resultados."
-   ]
-  },
-  {
-   "cell_type": "markdown",
-   "metadata": {},
-   "source": [
+    "---\n",
+    "\n",
     "A continuación, se procede a aplicar las técnicas de *clustering*.\n",
     "\n",
-    "---"
+    "(Info teórica sobre los algoritmos de clustering excepto Fuzzy se puede hallar acá: https://scikit-learn.org/stable/modules/clustering.html)"
    ]
   },
   {
@@ -227,7 +220,7 @@
     {
      "data": {
       "application/vnd.jupyter.widget-view+json": {
-       "model_id": "7391b499b0b94bc09e5897e8f38cf898",
+       "model_id": "8e6a10821f7c4e42aa28008dd4facacb",
        "version_major": 2,
        "version_minor": 0
       },
@@ -294,14 +287,9 @@
    "cell_type": "markdown",
    "metadata": {},
    "source": [
-    "##### Smile\n",
-    "El parámetro $k$, debe ser 4 para obtener una solución óptima según lo mencionado anteriormente, sin embargo, los cluster formados no son los esperados, esto ocurre porque k-meas no puede manejar la diferencia de distribuciones como uno esperaria. Dado que k-means no funciona bien con distribución de datos esferica el cluster exterior y los ojos no son detectados correctamente, incluso, el cluster circular exterior pertenece a cuatro cluster diferentes, eso ocurre porque los centroides se mueven en cada iteración hasta quedar ubicados en posiciones donde cada punto minimice la distancia con su respectivo centroide.\n",
-    "##### Mouse\n",
-    "El parametro $k$ debe ser 3 para obtener los cluster esperados según lo mencionado anteriormente. Para este caso k-means logra parcialmente formar los cluster esperados aun que _la cabeza_ no pertenece a un solo cluster, pues la densidad de los datos no permite la separación completa de las _orjas_ en cluster diferentes al de _la cabeza_. Si el centroide de _las orjas_ queadra en el centro de las mismas, habrán datos por ejemplo en la parte posterior de la cabeza que menor distancia al cluster de las orjas que al cluster de la cabeza, y esto obliga a los centroide a moverse.\n",
-    "##### Spiral\n",
-    "Se espera la detección de tres cluster (uno para cada espiral), por lo tanto, el parametro $k$ debe ser igual a 3 si queremos formar tres clusters. En este caso, K-means no forma ningún cluster de forma correcta por las mismas razones mencionasdas anteriormente. Sin importar la posición de los centroides, la distribución de los datos genera que los puntos del espiral sean cercanos a más de un centroide.\n",
+    "#### Análisis K-Means\n",
     "\n",
-    "En resumen, K-means tiene poca calidad en estos datasets, porque sus distribuciones no cumplen con los supuestos que este algoritmo asume: clusters globulares y de densidad similar.\n",
+    "Bla...\n",
     "\n",
     "---"
    ]
@@ -315,15 +303,13 @@
   },
   {
    "cell_type": "code",
-   "execution_count": 8,
-   "metadata": {
-    "scrolled": false
-   },
+   "execution_count": 42,
+   "metadata": {},
    "outputs": [
     {
      "data": {
       "application/vnd.jupyter.widget-view+json": {
-       "model_id": "c6adfc34700f4d769020a74021ca1fc3",
+       "model_id": "c0143fc1a5ee4009855c05dd183f0ea9",
        "version_major": 2,
        "version_minor": 0
       },
@@ -369,25 +355,7 @@
    "source": [
     "#### Análisis Agglomerative Hierarchical Clustering\n",
     "\n",
-    "##### Smile\n",
-    "\n",
-    "Single-link: Esta versión de HAC hace que cada cluster integre para sí el objeto o cluster exterior que tenga la distancia minima con alguno de sus objetos miembro. Esto hace que HAC single-link tenga un comportamiento local, por lo que es apto para clústers de distinta densidad y sin estructura definida. Eligiendo el dataset smile, se nota que el algoritmo es capaz de separar los cuatro clusters sin importar sus diferencias en forma y densidad.\n",
-    "\n",
-    "Complete-link: En esta versión, los clusters se unen de manera que se \"minimiza el diametro\" de su unión. Esta propiedad hace que complete-link tenga un comportamiento más global que single-link, haciendo que se prefiera la construcción de clusters más compactos. En el dataset smile, observamos que, mientras los clusters internos (ojos, sonrisa) se encuentran correctamente, es el cluster externo (contorno) el que se ve afectado. Debido a que este cluster es demasiado grande, complete-link prefiere romperlo e integrar partes de éste a los otros clusters.\n",
-    "\n",
-    "##### Mouse\n",
-    "\n",
-    "Single-link: En este caso se observa que, definiendo n_clusters=3, el algoritmo determina que todo el ratón (dos orejas y cabeza) pertenecen a un solo cluster, mientras que los otros dos clusters encontrados pertenecen a objetos \"ruido\" o outliers. Esto se debe al comportamiento local de single-link, que lo hace incapaz de identificar objetos outliers como tales.\n",
-    "\n",
-    "Complete-link: El resultado mejora pero queda lejos de ser adecuado. Notamos que la presencia de outliers provoca que la medida de similitud o cercanía inter-cluster pueda ser muy afectada, perjudicando la decisión de unión de clusters.\n",
-    "\n",
-    "##### Spiral\n",
-    "\n",
-    "Single-link: eligiendo n_clusters=3, se obtiene la identificación esperada de clusters. Este resultado tiene la misma explicación que se dio para el caso del dataset smile.\n",
-    "\n",
-    "Complete-link: HAC complete-link falla al intentar identificar los espirales correctamente. En este tipo de casos, donde el dataset está distribuido de acuerdo a una alta estructuralidad, complete-link, al tener un comportamiento global, prefiere descartar la estrucura local de los datos en favor de generar clusters compactos o de mínimo diámetro.\n",
-    "\n",
-    "En resumen, HAC single-link resultó útil para datasets de estructura compleja, como smile y spiral En mouse, se comportó mal, probablemente por la presencia de ruido. Complete-link tuvo mal resultado en los tres datasets, pues no considera la estructura local de los objetos, y tampoco es robusto ante la presencia de ruido.\n",
+    "Bla...\n",
     "\n",
     "---"
    ]
@@ -401,15 +369,13 @@
   },
   {
    "cell_type": "code",
-   "execution_count": 9,
-   "metadata": {
-    "scrolled": false
-   },
+   "execution_count": 62,
+   "metadata": {},
    "outputs": [
     {
      "data": {
       "application/vnd.jupyter.widget-view+json": {
-       "model_id": "22d66acc202747b2b577d592c4c4c1f2",
+       "model_id": "87951127bd49445db29a389a68d82d9c",
        "version_major": 2,
        "version_minor": 0
       },
@@ -485,24 +451,7 @@
    "source": [
     "#### Análisis DBSCAN\n",
     "\n",
-    "##### Smile\n",
-    "Los parámetros para lograr la solución esperada, son los siguientes:\n",
-    "* eps: 0.13. Si se usa un valor mayor, se van a detectar menos cluster por que cada vez más puntos estarán dentro del radio del core. Si se usa un valor menor, los puntos de contorno no logran estar dentro del radio de ninguno de los core.\n",
-    "* min_pts: 21. Si se usan valores mayor a 21, los puntos del contorno no entran en ningun radio de los core. Para valores menores se mantienen los cluster. \n",
-    "\n",
-    "El algoritmo DBSCAN funciona muy bien en este set de datos ya que es capaz de detectar formas al separar los cluster según su densidad, sin embargo hay que ser minucioso a la hora de elegir los parámetros para lograr un resultado óptimo.\n",
-    "\n",
-    "##### Mouse\n",
-    "Para este set de datos, el algoritmo será incapaz de detectar los cluster esperados independiente de los parametros por que la distribucion de los datos no tiene una diferencia tan marcada, se podrá diferenciar las _orejas_ de la _cabeza_, pero no las orejas entre sí. Sin embargo, este algoritmo podría ser util para detectar los outliers en el set de datos.\n",
-    "\n",
-    "##### Spiral\n",
-    "Una posible combinación de parametros para lograr la solución esperada es la siguiente:\n",
-    "* min_pts: 3, si aumenta la cantidad minima de puntos, apareceran puntos noise y será necesario aumentar el eps.\n",
-    "* eps: 1.11, si el min_pts se mantiene, este valor podrá aumentar sin cambios en los cluster, en cambio si disminuye, comenzaran a aparecer puntos noise y a se comenzaran a formar más de tres cluster\n",
-    "\n",
-    "En terminos generales, si aumenta el numero de min_pts, hay que aumentar tambien el eps, esto ocurre porque en el centro de los espirales los datos están mayormente concentrados.\n",
-    "\n",
-    "El algoritmo funciona bien para este set de datos y puede detectar la forma de los espirales por la concentración de los datos (densidad), pero el resultados obtenido es muy sensible a los parametros ingresados.\n",
+    "Bla...\n",
     "\n",
     "---"
    ]
@@ -516,15 +465,13 @@
   },
   {
    "cell_type": "code",
-   "execution_count": 13,
-   "metadata": {
-    "scrolled": false
-   },
+   "execution_count": 67,
+   "metadata": {},
    "outputs": [
     {
      "data": {
       "application/vnd.jupyter.widget-view+json": {
-       "model_id": "ba2685114ebd4436a6e6e1ad717aad70",
+       "model_id": "65df108dd2cc4fa19018e66d84d7dd81",
        "version_major": 2,
        "version_minor": 0
       },
@@ -546,7 +493,7 @@
     "\n",
     "@interact(\n",
     "    dataset_name=['smile', 'mouse', 'spiral'],\n",
-    "    bandwidth=(0.1, 5, 0.005),\n",
+    "    bandwidth=(0.1, 10, 0.1),\n",
     ")\n",
     "def plot_kmeans(dataset_name, bandwidth):\n",
     "    if dataset_name == 'smile':\n",
@@ -564,7 +511,7 @@
     "    plt.scatter(centroids[:, 0], centroids[:, 1], marker='x', s=100, \n",
     "                linewidths=2, c=list(range(len(centroids))), \n",
     "                cmap=plt.cm.tab20)\n",
-    "    plt.title('Algoritmo: Mean-shift | dataset: {} | bandwidth={}\\nClusters resultantes: {}'.format(dataset_name, round(bandwidth, 2), len(centroids)))\n",
+    "    plt.title('Algoritmo: Mean-shift | dataset: {} | bandwidth={}\\nClusters resultantes: {}'.format(dataset_name, bandwidth, len(centroids)))\n",
     "    plt.legend(loc='upper left')"
    ]
   },
@@ -574,16 +521,7 @@
    "source": [
     "#### Análisis Mean-shift\n",
     "\n",
-    "En general este algoritmo es malo para los tres set de datos, ya que éste funciona bien para densidades uniformes y los dataset no cumplen esta propiedad El dataset que tiene mayor uniformidad en sus datos es mouse y es el único que logra obtener cluster parecidos a los esperados, aunque no se logra coincidir con el número de ellos.\n",
-    "\n",
-    "##### Smile\n",
-    "No existe un intervalo de valores para el parámetro bandwidth que detecte cuatro clusters. Con bandwidth igual a 0.3 se tienen tres clusters que logran separar la boca y los ojos pero no el contorno. Este es el resultado que más se acerca a lo buscado, pero de todas formas no es bastante alejado de lo esperado. Esto ocurre porque la densidad de los datos no es uniforme y el contorno circular no tiene una zona de mayor concentración a la que se pueda mover el vector.\n",
-    "\n",
-    "##### Mouse\n",
-    "Con este algoritmo no hay un valor para el parametro bandwidth que logre si quiera un acercamiento a lo esperado, por ejemplo con bandwidth igual a 0.1 se obtiene diez clusters, mientras que para 0.2 se obtienen cuatro clusters. Esto ocurre porque la densidad del set de datos no está bien clara como para lograr que los vectores se concentre sólo en la _cabeza_ y en las _orejas_. \n",
-    "\n",
-    "##### Spiral\n",
-    "En este algoritmo con un bandwidth igual a 6 se logra obtener el número de clusters esperados (tres), sin embargo, la forma de los clusters está bien alejada de lo que se busca. Esto ocurre por la naturaleza del algoritmo, que hace que al formar clusters moviendo un centroide a zonas de mayor concentración, tome un comportamiento similar al de k-means.\n",
+    "Bla...\n",
     "\n",
     "---"
    ]
@@ -597,13 +535,13 @@
   },
   {
    "cell_type": "code",
-   "execution_count": 17,
+   "execution_count": 127,
    "metadata": {},
    "outputs": [
     {
      "data": {
       "application/vnd.jupyter.widget-view+json": {
-       "model_id": "5b59df3ee3574bf7a9577651feae67ff",
+       "model_id": "fde4ae5ace614680940348f0aa410836",
        "version_major": 2,
        "version_minor": 0
       },
@@ -658,8 +596,8 @@
     "    dataset_name=['smile', 'mouse', 'spiral'],\n",
     "    affinity=['RBF', 'K-nearest neighbors'],\n",
     "    n_clusters=(2,10, 1),\n",
-    "    gamma=(0.1, 100.0, 0.1),\n",
-    "    n_neighbors=(1, 200, 1),\n",
+    "    gamma=(0.1, 5.0, 0.1),\n",
+    "    n_neighbors=(1, 20, 1),\n",
     ")\n",
     "def plot_spectral(\n",
     "    dataset_name,\n",
@@ -705,56 +643,16 @@
    "cell_type": "markdown",
    "metadata": {},
    "source": [
+    "# (Se pueden agregar más métodos de construcción de matriz de afinidad)"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
     "#### Análisis Spectral clustering\n",
     "\n",
-    "Para este algoritmo se definieron dos métodos de construcción de matriz de afinidad: primero, un kernel RBF (Radial Basis Function kernel, o Gaussian kernel), y segundo, los $k$ vecinos más cercanos. Una matriz de afinidad debe estar bien definida, esto es, objetos que se encuentran cerca entre sí deben tener una afinidad mayor a objetos lejanos entre sí.\n",
-    "\n",
-    "RBF: Para construir una matriz de afinidad basada en el kernel RBF, se necesita la matriz de distancias entre objetos $D$. A cada distancia entre pares de objetos $d_{ij}$, se le aplica la función kernel $K$:\n",
-    "\n",
-    "\n",
-    "\\begin{equation}\n",
-    "K(d_{ij}) = e^{\\left(-\\gamma d_{ij}^2\\right)}\n",
-    "\\end{equation}\n",
-    "\n",
-    "Donde $\\gamma$ (gamma) es un parámetro libre que define el \"tamaño\" del kernel.\n",
-    "\n",
-    "Como resultado, cada distancia $d_{ij}$ ahora tendrá un valor en el intervalo $[0, 1]$, donde los valores cercanos a 0 corresponden a los pares de objetos más lejanos entre sí, mientras que los cercanos a 1 son pares de objetos muy cercanos.\n",
-    "\n",
-    "K-nearest neighbors: esta matriz de afinidad se define:\n",
-    "\n",
-    "\n",
-    "\\begin{equation}\n",
-    "  d_{ij} =\n",
-    "  \\begin{cases}\n",
-    "                                   1 & \\text{si $objeto_j \\in kNN(objeto_i)$} \\\\\n",
-    "                                   0 & \\text{si no.}\n",
-    "  \\end{cases}\n",
-    "\\end{equation}\n",
-    "\n",
-    " \n",
-    "\n",
-    "##### Smile\n",
-    "\n",
-    "RBF: El resultado de aplicar esta matriz de afinidad nos dice que el algoritmo tiene un comportamiento no local respecto a la distribución de los objetos, y que el resultado prácticamente no varía al cambiar el tamaño del kernel gamma. Notamos que los ojos logran identificarse bien, no así la sonrisa, que resulta dividida a la mitad, de forma parecida con el contorno, que es dividido en cuatro partes iguales. Se concluye que el kernel RBF no es adecuado para objetos cuya distribución varía globalmente.\n",
-    "\n",
-    "K-nearest neighbors: Con esta matriz de afinidad se llega al resultado esperado. Sin embargo, en este caso particular, observamos una gran sensibilidad respecto a la calidad del resultado y a la cantidad de vecinos $k$ con la que se genera la matriz de afinidad. En nuestro caso, $k=5$ fue el mínimo valor que produjo la separación de clusters deseada. Si se varía $k$, se observa que el resultado varía considerablemente, produciendo el resultado esperado en algunos casos, y resultados incorrectos en otros.\n",
-    "\n",
-    "##### Mouse\n",
-    "\n",
-    "RBF: Para este dataset, esta matriz de afinidad permite un resultado parecido al esperado. Con valores de gamma pequeños, la división inter-cluster es bastante nítida. Si se aumenta, esta división se hace menos sensible a cambios de densidad en los puntos donde los clusters se intersectan. Debido a que las orejas tienen mayor densidad que la cabeza, observamos que con RBF parte de la cabeza se asigna a los clusters de las orejas, lo que no es deseable.\n",
-    "\n",
-    "K-nearest neighbors: Definiendo esta matriz, el resultado es el esperado. Al reflejar mejor la relación local entre objetos, la matriz kNN permite a Spectral clustering definir de mejor manera la separación entre los clusters de las orejas con el de la cabeza. El resultado es de mejor calidad con $k$ entre 10 y 40 aproximadamente. Para $k$ muy grande, el algoritmo comienza a considerar la estructura no local de los datos, por lo que comienza a dar resultados más parecidos a RBF.\n",
-    "\n",
-    "##### Spiral\n",
-    "\n",
-    "RBF: En este caso, se obtiene la identificación de clusters deseada si gamma está entre 0.5 y 14.0 aproximadamente, lo que representa una buena sensibilidad del parámetro respecto al resultado obtenido. Creemos que la diferencia de este caso con la mala calidad obtenida en el dataset smile se debe a que en spiral, los datos se distribuyen de manera más uniforme, por lo que no existen regiones con mayor densidad de objetos que puedan afectar la decisión del algoritmo en la formación de clusters.\n",
-    "\n",
-    "K-nearest neighbors: Si $k$ es igual a 3 o 4, entonces Spectral clustering llega al resultado deseado, no así con cualquier otro valor de $k$. La alta sensibilidad se repite, como ocurrió con smile.\n",
-    "\n",
-    "En resumen, observamos que Spectral clsutering es una técnica bastante flexible y que es capaz de obtener resultados de calidad si se configura correctamente. En particular, usando RBF para definir similitud entre objetos parece tener resultados buenos a nivel local si gamma es pequeño, y a nivel global si se incrementa. El mal resultado obtenido en smile nos lleva a concluir que RBF no rinde bien con clusters de densidad variable.\n",
-    "\n",
-    "Con K-nearest neighbors como relación de afinidad entre objetos, se obtiene un resultado apto para identificar clusters a nivel local y con densidad variable. Aumentando la cantidad de vecinos $k$ hace que Spectral clustering tenga un comportamiento menos local. La desventaja de esta métrica de afinidad es que el resultado es en general bastante sensible al parámetro $k$.\n",
-    "\n",
+    "Bla...\n",
     "\n",
     "---"
    ]
@@ -768,15 +666,13 @@
   },
   {
    "cell_type": "code",
-   "execution_count": 18,
-   "metadata": {
-    "scrolled": false
-   },
+   "execution_count": 145,
+   "metadata": {},
    "outputs": [
     {
      "data": {
       "application/vnd.jupyter.widget-view+json": {
-       "model_id": "f332d58ef227458eb2e10fabb70869e2",
+       "model_id": "b0008756cccb492cb732b2620803a734",
        "version_major": 2,
        "version_minor": 0
       },
@@ -868,29 +764,10 @@
    "source": [
     "#### Análisis Fuzzy C-Means\n",
     "\n",
-    "En general se puede observar que este algoritmo tiene el mismo comportamiento que k-means y el único parametro que afecta el resultado es n_cluster (numero de cluster), esto ocurre porque la gráfica no muestra el nivel de pertenencia de cada punto, que es la idea principal del algoritmo.\n",
-    "Entonces, considerando lo anterior, los parámetros ideales para cada dataset seran como los de k-means:\n",
+    "(este link puede ayudar con el análisis: https://pythonhosted.org/scikit-fuzzy/auto_examples/plot_cmeans.html)\n",
     "\n",
-    "#### Smile: \n",
-    "* n_clusters: 4\n",
+    "Bla...\n",
     "\n",
-    "#### Mouse:\n",
-    "* n_cluster: 3\n",
-    "\n",
-    "#### Spiral: \n",
-    "* n_cluster: 3\n",
-    "\n",
-    "En los tres dataset, al cambiar el valor de p_exponent o del error se veran leves cambios en la posición del centroide lo que afectara en los puntos de borde de cada cluster, pero la forma general de los cluster se mantendrá intacta.\n",
-    "\n",
-    "---\n",
-    "\n",
-    "### Conclusiones.\n",
-    "\n",
-    "Finalmente considerando la eficiencia y resultados de los cluster se puede conluir que:\n",
-    "* Para el dataset smile el algoritmo que da mejores resultados es DBSCAN.\n",
-    "* Para el dataset mouse el algoritmo que da mejores resultados podría ser k-means o fuzzy c-means.\n",
-    "* Para el dataset spiral el algoritmo que da mejores resultados es DBSCAN.\n",
-    " \n",
     "---"
    ]
   },
@@ -912,18 +789,7 @@
    "cell_type": "markdown",
    "metadata": {},
    "source": [
-    "**Resp.**: La situación anteriormente descrita puede ocurrir si los 100 datos son iguales, es decir, se ubican en el mismo punto, de esta forma, los datos serán más cercanos a un solo centroide y pertenecerán a un cluster mientras que los demás cluster no tendran datos.\n",
-    "\n",
-    "Si los datos estuviesen un poco mas distribuidos en el espacio, la unica forma de que ocurra esta situación es que de los centroides iniciales solo uno este cerca de los datos y el resto esto lo suficientemente alejado para no alcanzar los datos.\n",
-    "\n",
-    "El resultado de DBSCAN será un solo cluster con todos los puntos dentro independiente del eps."
-   ]
-  },
-  {
-   "cell_type": "markdown",
-   "metadata": {},
-   "source": [
-    "---"
+    "Resp.:"
    ]
   },
   {
@@ -937,7 +803,7 @@
    "cell_type": "markdown",
    "metadata": {},
    "source": [
-    "**Resp.**: En cada iteración de single-link, un punto se incluye en cualquiera sea el cluster al cual pertenezca su punto más cercano. Al construirse los clusters de esta manera, no existe forma de que algún par de puntos de distintos clusters sean más cercanos entre sí que con los puntos de sus respectivos clusters.\n",
+    "Resp.: En cada iteración de single-link, un punto se incluye en cualquiera sea el cluster al cual pertenezca su punto más cercano. Al construirse los clusters de esta manera, no existe forma de que algún par de puntos de distintos clusters sean más cercanos entre sí que con los puntos de sus respectivos clusters.\n",
     "\n",
     "En cambio, en complete-link esto sí puede ocurrir. Considerar, por ejemplo, la siguiente distribución de los objetos A, B, C, D, E en una dimensión:\n",
     "\n",
